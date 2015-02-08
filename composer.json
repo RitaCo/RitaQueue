@@ -1,10 +1,10 @@
 {
-    "name": "ritaco/QueueJob",
-    "description": "QueueJob plugin for CakePHP",
+    "name": "ritaco/JobQueue",
+    "description": "JobQueue plugin for CakePHP",
     "type": "cakephp-plugin",
-    "homepage": "https://github.com/RitaCo/cakephp-accunting-plugin",
+    "homepage": https://github.com/RitaCo/cakephp-job-queue",
     "license": "MIT",
-    "keywords": ["cakephp",  "Accunting", "Money", "payment"],
+    "keywords": ["cakephp3",  "Job", "task", "queue"],
     "version": "3.0.0-dev",
     "authors": [
         {
@@ -14,8 +14,8 @@
         }
     ],
     "support":{
-        "source": "https://github.com/RitaCo/cakephp-accunting-plugin",
-        "issues": "https://github.com/RitaCo/cakephp-accunting-plugin/issues"
+        "source": "https://github.com/RitaCo/cakephp-job-queue",
+        "issues": "https://github.com/RitaCo/cakephp-job-queue/issues"
     },
     "require": {
         "php": ">=5.4",
@@ -36,6 +36,6 @@
         }
     },
     "extra": {
-        "installer-name": "Rita/QueueJob"
+        "installer-name": "Rita/JobQueue"
     }           
 }

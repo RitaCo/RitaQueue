@@ -1,6 +1,5 @@
 <?php
-
-namespace QueueJob\Controller;
+namespace Rita\JobQueue\Controller;
 
 use App\Controller\AppController as BaseController;
 

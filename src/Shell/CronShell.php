@@ -1,7 +1,16 @@
 <?php
-App::uses('Folder', 'Utility');
-App::uses('AppShell', 'Console/Command');
+namespace Rita\JobQueue\Shell;
 
+
+use Cake\Cache\Cache;
+use Cake\Console\Shell;
+use Cake\Core\Configure;
+use Cake\Core\ConventionsTrait;
+use Cake\Core\Plugin;
+use Cake\Datasource\ConnectionManager;
+use Cake\Utility\Inflector;
+use Cake\Core\App;
+use Cake\Filesystem\Folder;
 /**
  * Cronjob via crontab etc triggering this script every few minutes
  * Alternative to indefinitly running queues
@@ -17,11 +26,11 @@ App::uses('AppShell', 'Console/Command');
  * @license http://www.opensource.org/licenses/mit-license.php The MIT License
  * @link http://github.com/MSeven/cakephp_queue
  */
-class CronShell extends AppShell {
+class CronShell extends Shell 
+{
 
-	public $uses = array(
-		'Queue.CronTask'
-	);
+
+    
 
 /**
  * @var CronTask
@@ -38,19 +47,23 @@ class CronShell extends AppShell {
  *
  * @return void
  */
-	public function initialize() {
-		$this->_loadModels();
+	public function initialize() 
+    {
+        parent::initialize();
+        $this->loadModel('Rita/JobQueue.CronTasks');
+		///$this->_loadModels();
 
-		$x = App::objects('Queue.Task'); //'Console/Command/Task'
+//		$x = App::objects('Queue.Task'); //'Console/Command/Task'
 		//$x = App::path('Task', 'Queue');
 
-		$paths = App::path('Console/Command/Task');
+		$paths = App::path('Shell/Task');
+        debug($paths);
 		foreach ($paths as $path) {
 			$Folder = new Folder($path);
 			$this->tasks = array_merge($this->tasks, $Folder->find('Queue.*\.php'));
 		}
 
-		$plugins = App::objects('plugin');
+		$plugins = Plugin::loaded();
 		foreach ($plugins as $plugin) {
 			$pluginPaths = App::path('Console/Command/Task', $plugin);
 			foreach ($pluginPaths as $pluginPath) {
@@ -81,6 +94,52 @@ class CronShell extends AppShell {
 		*/
 		), $conf));
 	}
+
+   public function loadTasks()
+    {
+        $tasks = [];
+
+        $tasks = $this->_findTasks($tasks, APP, Configure::read('App.namespace'));
+        foreach (Plugin::loaded() as $plugin) {
+            $tasks = $this->_findTasks(
+                $tasks,
+                Plugin::classPath($plugin),
+                $plugin,
+                $plugin
+            );
+        }
+
+        $this->tasks = array_values($tasks);
+        parent::loadTasks();
+    }
+
+    /**
+     * Append matching tasks in $path to the $tasks array.
+     *
+     * @param array $tasks The task list to modify and return.
+     * @param string $path The base path to look in.
+     * @param string $namespace The base namespace.
+     * @param string|null $prefix The prefix to append.
+     * @return array Updated tasks.
+     */
+    protected function _findTasks($tasks, $path, $namespace, $prefix = null)
+    {
+        $path .= 'Shell/Task';
+        if (!is_dir($path)) {
+            return $tasks;
+        }
+        $candidates = $this->_findClassFiles($path, $namespace);
+        $classes = $this->_findTaskClasses($candidates);
+        foreach ($classes as $class) {
+            list(, $name) = namespaceSplit($class);
+            $name = substr($name, 0, -4);
+            $fullName = ($prefix ? $prefix . '.' : '') . $name;
+            $tasks[$name] = $fullName;
+        }
+        return $tasks;
+    }
+
+
 
 /**
  * Output some basic usage Info.

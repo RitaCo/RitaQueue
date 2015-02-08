@@ -356,14 +356,32 @@ class CronTask extends QueueAppModel {
  * @param mixed $value value
  * @return array       list of jobtypes
  */
-	public static function jobtypes($value = null) {
+	public static function jobtypes($value = null) 
+    {
 		$options = array(
 			self::TYPE_TASK => __d('queue', 'Task'),
 			self::TYPE_MODEL => __d('queue', 'Model (Method)'),
 		);
-		return parent::enum($value, $options);
+		return self::enum($value, $options);
 	}
 
+
+    public static function enum($value, $options, $default = null) 
+    {
+		if ($value !== null && !is_array($value)) {
+			if (array_key_exists($value, $options)) {
+				return $options[$value];
+			}
+			return $default;
+		} elseif ($value !== null) {
+			$newOptions = [];
+			foreach ($value as $v) {
+				$newOptions[$v] = $options[$v];
+			}
+			return $newOptions;
+		}
+		return $options;
+	}
 	const TYPE_TASK = 0;
 
 	const TYPE_MODEL = 1;

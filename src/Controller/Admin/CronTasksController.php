@@ -1,17 +1,20 @@
 <?php
-App::uses('QueueAppController', 'Queue.Controller');
+namespace Rita\JobQueue\Controller\Admin;
 
-class CronTasksController extends QueueAppController {
+use \Rita\JobQueue\Controller\AppController;
+use \Cake\Event\Event;
 
-	public $paginate = array();
+
+class CronTasksController extends AppController {
+
 
 /**
  * beforeFilter action
  *
  * @return void
  */
-	public function beforeFilter() {
-		parent::beforeFilter();
+	public function beforeFilter(Event $event) {
+		parent::beforeFilter($event);
 	}
 
 /**
@@ -19,7 +22,7 @@ class CronTasksController extends QueueAppController {
  *
  * @return void
  */
-	public function index() {
+	public function indexa() {
 		$this->CronTask->recursive = 0;
 		$cronTasks = $this->paginate();
 		$this->set(compact('cronTasks'));
@@ -110,8 +113,8 @@ class CronTasksController extends QueueAppController {
  *
  * @return void
  */
-	public function admin_index() {
-		$this->CronTask->recursive = 0;
+	public function index() {
+
 		$cronTasks = $this->paginate();
 		$this->set(compact('cronTasks'));
 	}
